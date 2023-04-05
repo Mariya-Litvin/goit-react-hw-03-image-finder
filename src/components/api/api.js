@@ -6,9 +6,13 @@ const searchParams = new URLSearchParams({
   image_type: 'photo',
   orientation: 'horizontal',
 });
-export const resultSearch = async ({ search, page, per_page }) => {
-  const response = await axios.get(
-    `/?q=${search}&${searchParams}&page=${page}&per_page=${per_page}`
-  );
-  return response.data;
+export const resultSearch = async ({ searchQuery, page }) => {
+  try {
+    const response = await axios.get(
+      `/?q=${searchQuery}&${searchParams}&page=${page}&per_page=12`
+    );
+    return response.data;
+  } catch (error) {
+    console.log(error);
+  }
 };
