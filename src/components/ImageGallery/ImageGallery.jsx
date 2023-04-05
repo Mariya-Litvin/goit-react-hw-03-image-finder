@@ -16,8 +16,15 @@ export class ImageGallery extends Component {
   };
 
   async componentDidUpdate(prevProps, prevState) {
-    const search = this.props.searchWord.trim();
+    const search = this.props.searchWord;
+    // console.log(search);
     const { page, per_page } = this.state;
+
+    const options = {
+      search: search,
+      page: page,
+      per_page: per_page,
+    };
     if (prevProps.searchWord !== search && search) {
       this.setState({
         articles: [],
@@ -25,7 +32,7 @@ export class ImageGallery extends Component {
       });
 
       try {
-        const response = await resultSearch(search, page, per_page);
+        const response = await resultSearch(options);
         if (response.hits.length === 0) {
           return Notiflix.Notify.info(
             'Sorry, there are no images matching your search query. Please try again.'
@@ -36,14 +43,15 @@ export class ImageGallery extends Component {
 
         this.setState({
           articles: articles,
+          // page: 1,
         });
       } catch (error) {
         console.log(error.message);
       }
     }
-    if (prevState.page !== this.state.page && this.state.page !== 1) {
+    if (prevState.page !== page && page !== 1) {
       try {
-        const response = await resultSearch(search, page, per_page);
+        const response = await resultSearch(options);
         const articles = [...this.state.articles, ...response.hits];
 
         this.setState({
