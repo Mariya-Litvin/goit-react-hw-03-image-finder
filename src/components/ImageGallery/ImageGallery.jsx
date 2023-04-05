@@ -1,9 +1,10 @@
-// import axios from 'axios';
+import Notiflix from 'notiflix';
 import { ImageGalleryItem } from 'components/ImageGalleryItem/ImageGalleryItem';
 import { Component } from 'react';
 import { resultSearch } from '../api/api';
 import { ImageGalleryEl, ImageGalleryList } from './ImageGallery.styled';
 import { Modal } from '../Modal/Modal';
+import { Button } from 'components/Button/Button';
 
 export class ImageGallery extends Component {
   state = {
@@ -16,17 +17,33 @@ export class ImageGallery extends Component {
 
   async componentDidUpdate(prevProps, prevState) {
     const search = this.props.searchWord.trim();
-    if (
-      (prevProps.searchWord !== search && search) ||
-      prevState.page !== this.state.page
-    ) {
-      const page = this.state.page;
-      const per_page = this.state.per_page;
+    const { page, per_page } = this.state;
+    if (prevProps.searchWord !== search && search) {
+      this.setState({
+        articles: [],
+        page: 1,
+      });
 
       try {
         const response = await resultSearch(search, page, per_page);
-        // const totalHits = response.totalHits;
-        // console.log(totalHits);
+        if (response.hits.length === 0) {
+          return Notiflix.Notify.info(
+            'Sorry, there are no images matching your search query. Please try again.'
+          );
+        }
+
+        const articles = response.hits;
+
+        this.setState({
+          articles: articles,
+        });
+      } catch (error) {
+        console.log(error.message);
+      }
+    }
+    if (prevState.page !== this.state.page && this.state.page !== 1) {
+      try {
+        const response = await resultSearch(search, page, per_page);
         const articles = [...this.state.articles, ...response.hits];
 
         this.setState({
@@ -35,8 +52,6 @@ export class ImageGallery extends Component {
       } catch (error) {
         console.log(error.message);
       }
-
-      // console.log(search);
     }
   }
 
@@ -57,11 +72,12 @@ export class ImageGallery extends Component {
     this.setState(prev => ({
       page: prev.page + 1,
     }));
-    console.log(this.state.page);
+    // console.log(this.state.page);
   };
 
   onButtonVisible = () => {
     if (
+      this.state.articles &&
       this.state.articles.length < Number(this.state.page * this.state.per_page)
     ) {
       return false;
@@ -90,9 +106,7 @@ export class ImageGallery extends Component {
           )}
         </ImageGalleryList>
         {this.onButtonVisible() && (
-          <button type="button" onClick={this.loadMoreCards}>
-            Load more
-          </button>
+          <Button onClickButton={this.loadMoreCards} />
         )}
       </>
     );
