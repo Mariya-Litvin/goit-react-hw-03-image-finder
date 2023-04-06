@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import { ImageGalleryEl, ImageGalleryImg } from './ImageGalleryItem.styled';
 
 export const ImageGalleryItem = ({ article, handleClick }) => {
@@ -10,4 +11,13 @@ export const ImageGalleryItem = ({ article, handleClick }) => {
       />
     </ImageGalleryEl>
   );
+};
+
+ImageGalleryItem.propTypes = {
+  article: PropTypes.shape({
+    webformatURL: PropTypes.string.isRequired,
+    tags: PropTypes.string.isRequired,
+    largeImageURL: PropTypes.string.isRequired,
+  }).isRequired,
+  handleClick: PropTypes.func.isRequired,
 };

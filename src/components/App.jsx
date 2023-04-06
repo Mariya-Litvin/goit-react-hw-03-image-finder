@@ -75,7 +75,7 @@ export class App extends Component {
   }
 
   handleSubmit = ({ name }) => {
-    if (name !== this.state.searchQuery) {
+    if (name !== this.state.searchQuery && name) {
       this.setState({
         searchQuery: name,
         page: 1,
