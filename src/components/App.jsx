@@ -47,14 +47,22 @@ export class App extends Component {
     }
   }
 
+  // handleSubmit = ({ name }) => {
+  //   if (name !== this.state.searchQuery) {
+  //     this.setState({
+  //       searchQuery: name,
+  //       page: 1,
+  //       articles: [],
+  //     });
+  //   }
+  // };
+
   handleSubmit = ({ name }) => {
-    if (name !== this.state.searchQuery) {
-      this.setState({
-        searchQuery: name,
-        page: 1,
-        articles: [],
-      });
-    }
+    this.setState({
+      searchQuery: name,
+      page: 1,
+      articles: [],
+    });
   };
 
   handleBigImg = img => {
