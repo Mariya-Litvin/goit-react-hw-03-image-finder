@@ -6,6 +6,7 @@ import Notiflix from 'notiflix';
 import { resultSearch } from './api/api';
 import { Modal } from './Modal/Modal';
 import { Button } from './Button/Button';
+import { Loader } from './Loader/Loader';
 
 export class App extends Component {
   state = {
@@ -15,9 +16,10 @@ export class App extends Component {
     per_page: 12,
     isOpen: false,
     bigImage: '',
+    isLoading: false,
   };
 
-  async componentDidUpdate(prevState) {
+  async componentDidUpdate(prevProps, prevState) {
     const options = {
       searchQuery: this.state.searchQuery,
       page: this.state.page,
@@ -26,43 +28,61 @@ export class App extends Component {
       prevState.searchQuery !== this.state.searchQuery &&
       this.state.searchQuery
     ) {
-      const response = await resultSearch(options);
+      try {
+        const response = await resultSearch(options);
 
-      if (response.hits && response.hits.length > 0) {
+        if (response.hits && response.hits.length > 0) {
+          this.setState({
+            articles: response.hits,
+            isLoading: false,
+          });
+        }
+        if (response.hits.length === 0) {
+          this.setState({
+            isLoading: false,
+          });
+          return Notiflix.Notify.info(
+            'Sorry, there are no images matching your search query. Please try again.'
+          );
+        }
+      } catch (error) {
         this.setState({
-          articles: response.hits,
+          isLoading: false,
         });
-      }
-      if (response.hits.length === 0) {
-        return Notiflix.Notify.info(
-          'Sorry, there are no images matching your search query. Please try again.'
+        Notiflix.Notify.failure(
+          'Sorry, something went wrong, please try again later',
+          error
         );
       }
     }
     if (prevState.page !== this.state.page && this.state.page !== 1) {
-      const response = await resultSearch(options);
-      this.setState({
-        articles: [...this.state.articles, ...response.hits],
-      });
+      try {
+        const response = await resultSearch(options);
+        this.setState({
+          articles: [...this.state.articles, ...response.hits],
+          isLoading: false,
+        });
+      } catch (error) {
+        this.setState({
+          isLoading: false,
+        });
+        Notiflix.Notify.failure(
+          'Sorry, something went wrong, please try again later',
+          error
+        );
+      }
     }
   }
 
-  // handleSubmit = ({ name }) => {
-  //   if (name !== this.state.searchQuery) {
-  //     this.setState({
-  //       searchQuery: name,
-  //       page: 1,
-  //       articles: [],
-  //     });
-  //   }
-  // };
-
   handleSubmit = ({ name }) => {
-    this.setState({
-      searchQuery: name,
-      page: 1,
-      articles: [],
-    });
+    if (name !== this.state.searchQuery) {
+      this.setState({
+        searchQuery: name,
+        page: 1,
+        articles: [],
+        isLoading: true,
+      });
+    }
   };
 
   handleBigImg = img => {
@@ -81,6 +101,7 @@ export class App extends Component {
   loadMoreCards = () => {
     this.setState(prev => ({
       page: prev.page + 1,
+      isLoading: true,
     }));
     // console.log(this.state.page);
   };
@@ -108,6 +129,7 @@ export class App extends Component {
         {this.onButtonVisible() && (
           <Button onClickButton={this.loadMoreCards} />
         )}
+        {this.state.isLoading && <Loader />}
       </AppWrapper>
     );
   }

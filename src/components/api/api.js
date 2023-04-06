@@ -1,4 +1,5 @@
 import axios from 'axios';
+// import Notiflix from 'notiflix';
 axios.defaults.baseURL = 'https://pixabay.com/api';
 
 const searchParams = new URLSearchParams({
@@ -7,12 +8,8 @@ const searchParams = new URLSearchParams({
   orientation: 'horizontal',
 });
 export const resultSearch = async ({ searchQuery, page }) => {
-  try {
-    const response = await axios.get(
-      `/?q=${searchQuery}&${searchParams}&page=${page}&per_page=12`
-    );
-    return response.data;
-  } catch (error) {
-    console.log(error);
-  }
+  const response = await axios.get(
+    `/?q=${searchQuery}&${searchParams}&page=${page}&per_page=12`
+  );
+  return response.data;
 };
