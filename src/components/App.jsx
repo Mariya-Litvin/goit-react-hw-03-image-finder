@@ -4,8 +4,8 @@ import { ImageGallery } from './ImageGallery/ImageGallery';
 import { AppWrapper } from './App.styled';
 import Notiflix from 'notiflix';
 import { resultSearch } from './api/api';
-import { Button } from 'components/Button/Button';
 import { Modal } from './Modal/Modal';
+import { Button } from './Button/Button';
 
 export class App extends Component {
   state = {
@@ -18,25 +18,32 @@ export class App extends Component {
   };
 
   async componentDidUpdate(prevState) {
+    const options = {
+      searchQuery: this.state.searchQuery,
+      page: this.state.page,
+    };
     if (
-      prevState.searchQuery !== this.state.searchQuery ||
-      prevState.page !== this.state.page
+      prevState.searchQuery !== this.state.searchQuery &&
+      this.state.searchQuery
     ) {
-      const options = {
-        searchQuery: this.state.searchQuery,
-        page: this.state.page,
-      };
       const response = await resultSearch(options);
 
       if (response.hits && response.hits.length > 0) {
-        this.setState(prevState => ({
-          articles: [...prevState.articles, ...response.hits],
-        }));
-      } else {
+        this.setState({
+          articles: response.hits,
+        });
+      }
+      if (response.hits.length === 0) {
         return Notiflix.Notify.info(
           'Sorry, there are no images matching your search query. Please try again.'
         );
       }
+    }
+    if (prevState.page !== this.state.page && this.state.page !== 1) {
+      const response = await resultSearch(options);
+      this.setState({
+        articles: [...this.state.articles, ...response.hits],
+      });
     }
   }
 
@@ -45,12 +52,7 @@ export class App extends Component {
       this.setState({
         searchQuery: name,
         page: 1,
-      });
-    } else {
-      this.setState({
         articles: [],
-        searchQuery: name,
-        page: 1,
       });
     }
   };

@@ -1,13 +1,13 @@
-import { ImageGalleryImg } from './ImageGalleryItem.styled';
+import { ImageGalleryEl, ImageGalleryImg } from './ImageGalleryItem.styled';
 
 export const ImageGalleryItem = ({ article, handleClick }) => {
   return (
-    <li>
+    <ImageGalleryEl>
       <ImageGalleryImg
         src={article.webformatURL}
         alt={article.tags}
         onClick={() => handleClick(article.largeImageURL)}
       />
-    </li>
+    </ImageGalleryEl>
   );
 };
