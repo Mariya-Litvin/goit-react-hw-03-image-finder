@@ -103,7 +103,6 @@ export class App extends Component {
       page: prev.page + 1,
       isLoading: true,
     }));
-    // console.log(this.state.page);
   };
 
   onButtonVisible = () => {
