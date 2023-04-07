@@ -30,14 +30,20 @@ export class App extends Component {
     ) {
       try {
         const response = await resultSearch(options);
+        const arr = response.hits.map(el => ({
+          tags: el.tags,
+          webformatURL: el.webformatURL,
+          largeImageURL: el.largeImageURL,
+          id: el.id,
+        }));
 
-        if (response.hits && response.hits.length > 0) {
+        if (arr && arr.length > 0) {
           this.setState({
-            articles: response.hits,
+            articles: arr,
             isLoading: false,
           });
         }
-        if (response.hits.length === 0) {
+        if (arr.length === 0) {
           this.setState({
             isLoading: false,
           });
@@ -58,8 +64,14 @@ export class App extends Component {
     if (prevState.page !== this.state.page && this.state.page !== 1) {
       try {
         const response = await resultSearch(options);
+        const arr = response.hits.map(el => ({
+          tags: el.tags,
+          webformatURL: el.webformatURL,
+          largeImageURL: el.largeImageURL,
+          id: el.id,
+        }));
         this.setState({
-          articles: [...this.state.articles, ...response.hits],
+          articles: [...this.state.articles, ...arr],
           isLoading: false,
         });
       } catch (error) {
